@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Smart_Pillow</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_music">Music</string>
+    <string name="title_activity_alram">Alram</string>
+    <string name="title_activity_sleep_pattern">SleepPattern</string>
+    <string name="title_activity_phone">phone</string>
+    <string name="title_activity_bluetooth">Bluetooth</string>
+    <string name="select_device">select a device to connect</string>
+    <string name="scanning">scanning for devices...</string>
+    <string name="none_paired">No device have been a paired</string>
+    <string name="none_found">No device found</string>
+    <string name="title_paired_devices">paired Devices</string>
+    <string name="title_other_devices">other Available Devices</string>
+    <string name="button_scan">Scanfor devices</string>
+    <string name="title_activity_alram__music">Alram_Music</string>
+    <string name="title_activity_music_folder">MusicFolder</string>
+    <string name="title_activity_music_play">MusicPlay</string>
+</resources>
