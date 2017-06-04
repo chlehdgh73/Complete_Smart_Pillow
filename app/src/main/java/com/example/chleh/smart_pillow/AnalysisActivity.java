@@ -28,7 +28,7 @@ import java.util.StringTokenizer;
 
 public class AnalysisActivity extends AppCompatActivity {
     SimpleDateFormat format = new SimpleDateFormat("yyyy:MM:dd:HH:mm:ss");
-    static final long HOUR = 30*60;
+    static final long HOUR = 15*60;
     static final long HALF_HOUR  = 10*60;
     private ArrayAdapter fileNameAdapter;
     private ListView listview;

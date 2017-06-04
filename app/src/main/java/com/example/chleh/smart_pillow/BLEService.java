@@ -537,7 +537,7 @@ public class BLEService extends Service {
                             state_start_time = time;
                         }
                         else{
-                            if((time - state_start_time) > 1800000){
+                            if((time - state_start_time) > 900000){
                                 save_state(STATE_DEEP, time);
                                 save_change_log(STATE_DEEP, time);
                                 now_state = STATE_DEEP;
@@ -617,7 +617,7 @@ public class BLEService extends Service {
                         sendBroadcast(intent);
                     }
                     else{
-                        if((time - state_start_time) > 1800000){
+                        if((time - state_start_time) > 600000){
                             save_state(STATE_COMPLETE_AWAKE, time);
                             save_change_log(STATE_COMPLETE_AWAKE, time);
                             now_state = STATE_COMPLETE_AWAKE;
