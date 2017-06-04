@@ -16,6 +16,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Binder;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import java.io.BufferedReader;
@@ -737,7 +738,6 @@ public class BLEService extends Service {
         }
         return false;
     }
-
     private boolean complete_log(){
         FileOutputStream file_out = null;
         PrintWriter writer = null;
@@ -751,39 +751,72 @@ public class BLEService extends Service {
         Date start_time, end_time;
         SimpleDateFormat format = new SimpleDateFormat("yyyy:MM:dd:HH:mm:ss");
 
+        //테스트코드
+        FileOutputStream file_out_sd = null;
+        PrintWriter writer_sd = null;
+        String sd_save_path = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "pillow_test";
+        File folder = new File(sd_save_path);
+        if(!folder.exists()){
+            folder.mkdirs();
+        }
+        //테스트코드
 
+        //여기서 파일을 읽어서 저장된 설정(선택된 베개의 블루투스 주소)를 읽어온다.
         try {
             file_in = openFileInput(SAVED_TEMP_LOG);
             buffer = new BufferedReader(new InputStreamReader(file_in));
 
+            //로그파일의 제일 처음 기록은 제일 처음 누운시각이 기록되어 있다.
             if((temp = buffer.readLine()) != null){
                 StringTokenizer tokenizer = new StringTokenizer(temp,":");
+                //처음 토큰(state)는 버리고
                 tokenizer.nextToken();
                 first_time = Long.parseLong(tokenizer.nextToken());
                 start_time = new Date(first_time);
-                end_time = new Date(state_start_time);
+                end_time = new Date(state_start_time);//임시 로그파일의 완전출력을 요구하는건 완전히 깨어났을때 이므로 이시간을 쓰면됨
                 save_path = getFilesDir().getAbsolutePath() + File.separator + LOG_FILE_FOLDER;
                 save_path += File.separator + format.format(first_time) + "~" + format.format(end_time) + ".txt";
+                //테스트코드
+                sd_save_path += File.separator + format.format(first_time) + "~" + format.format(end_time) + ".txt";
+                //테스트코드
             }
 
             file_out = new FileOutputStream(save_path);
             writer = new PrintWriter(file_out);
 
+            //테스트코드
+            file_out_sd = new FileOutputStream(sd_save_path);
+            writer_sd = new PrintWriter(file_out_sd);
+            //테스트코드
+
             if(temp != null){
                 writer.println(temp);
+                //테스트코드
+                writer_sd.println(temp);
+                //테스트코드
+
             }
             while((temp = buffer.readLine()) != null){
                 writer.println(temp);
+                //테스트코드
+                writer_sd.println(temp);
+                //테스트코드
             }
 
         } catch (FileNotFoundException e) {
+            //파일이 없고 생성도 실패
             return false;
         }
         catch (IOException e1){
+            //왜 발생할지 감도 안잡힙니다.
             return false;
         }
         finally{
             try {
+                //테스트코드
+                if(writer_sd != null) writer_sd.close();
+                if(file_out_sd != null) file_out_sd.close();
+                //테스트코드
                 if(writer != null) writer.close();
                 if(file_out != null) file_out.close();
                 if(buffer != null) buffer.close();
@@ -795,6 +828,8 @@ public class BLEService extends Service {
 
         return true;
     }
+
+
 
     public List<String> query_device() {
         List<String> result = new ArrayList<String>();
