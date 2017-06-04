@@ -673,126 +673,128 @@ public class BLEService extends Service {
             }
         }
 
-        private boolean save_state(int state, long time){
-            FileOutputStream file_out = null;
-            PrintWriter writer = null;
 
-            try {
-                file_out = openFileOutput(SAVED_STATE_FILE_NAME,Context.MODE_PRIVATE);
-                writer = new PrintWriter(file_out);
-                writer.println(state);
-                writer.println(time);
+    };
 
-            } catch (FileNotFoundException e) {
-                return false;
-            }
-            catch (IOException e1){
-                return false;
-            }
-            finally{
-                try {
-                    if(writer != null) writer.close();
-                    if(file_out != null) file_out.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            return true;
-        }
+    private boolean save_state(int state, long time){
+        FileOutputStream file_out = null;
+        PrintWriter writer = null;
 
-        private boolean save_change_log(int state, long time){
-            FileOutputStream file_out = null;
-            PrintWriter writer = null;
-            try {
-                file_out = openFileOutput(SAVED_TEMP_LOG,Context.MODE_APPEND);
-                writer = new PrintWriter(file_out);
-                writer.println(state + ":" + time);
-            } catch (FileNotFoundException e) {
-                return false;
-            }
-            catch (IOException e1){
-                return false;
-            }
-            finally{
-                try {
-                    if(writer != null) writer.close();
-                    if(file_out != null) file_out.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            return true;
-        }
+        try {
+            file_out = openFileOutput(SAVED_STATE_FILE_NAME,Context.MODE_PRIVATE);
+            writer = new PrintWriter(file_out);
+            writer.println(state);
+            writer.println(time);
 
-        private boolean clear_log_file(){
-            String path = getFilesDir().getAbsolutePath() + File.separator + SAVED_TEMP_LOG;
-            File file = new File(path);
-            if(file != null){
-                if(file.exists()){
-                    return file.delete();
-                }
-            }
+        } catch (FileNotFoundException e) {
             return false;
         }
-
-        private boolean complete_log(){
-            FileOutputStream file_out = null;
-            PrintWriter writer = null;
-            FileInputStream file_in = null;
-            BufferedReader buffer = null;
-
-            long first_time;
-            String save_path = "Unknown.txt";
-            String temp;
-
-            Date start_time, end_time;
-            SimpleDateFormat format = new SimpleDateFormat("yyyy:MM:dd:HH:mm:ss");
-
-
-            try {
-                file_in = openFileInput(SAVED_TEMP_LOG);
-                buffer = new BufferedReader(new InputStreamReader(file_in));
-
-                if((temp = buffer.readLine()) != null){
-                    StringTokenizer tokenizer = new StringTokenizer(temp,":");
-                    tokenizer.nextToken();
-                    first_time = Long.parseLong(tokenizer.nextToken());
-                    start_time = new Date(first_time);
-                    end_time = new Date(state_start_time);
-                    save_path = getFilesDir().getAbsolutePath() + File.separator + LOG_FILE_FOLDER;
-                    save_path += File.separator + format.format(first_time) + "~" + format.format(end_time) + ".txt";
-                }
-
-                file_out = new FileOutputStream(save_path);
-                writer = new PrintWriter(file_out);
-
-                if(temp != null){
-                    writer.println(temp);
-                }
-                while((temp = buffer.readLine()) != null){
-                    writer.println(temp);
-                }
-
-            } catch (FileNotFoundException e) {
-                return false;
-            }
-            catch (IOException e1){
-                return false;
-            }
-            finally{
-                try {
-                    if(writer != null) writer.close();
-                    if(file_out != null) file_out.close();
-                    if(buffer != null) buffer.close();
-                    if(file_in != null) file_in.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            return true;
+        catch (IOException e1){
+            return false;
         }
-    };
+        finally{
+            try {
+                if(writer != null) writer.close();
+                if(file_out != null) file_out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return true;
+    }
+
+    private boolean save_change_log(int state, long time){
+        FileOutputStream file_out = null;
+        PrintWriter writer = null;
+        try {
+            file_out = openFileOutput(SAVED_TEMP_LOG,Context.MODE_APPEND);
+            writer = new PrintWriter(file_out);
+            writer.println(state + ":" + time);
+        } catch (FileNotFoundException e) {
+            return false;
+        }
+        catch (IOException e1){
+            return false;
+        }
+        finally{
+            try {
+                if(writer != null) writer.close();
+                if(file_out != null) file_out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return true;
+    }
+
+    private boolean clear_log_file(){
+        String path = getFilesDir().getAbsolutePath() + File.separator + SAVED_TEMP_LOG;
+        File file = new File(path);
+        if(file != null){
+            if(file.exists()){
+                return file.delete();
+            }
+        }
+        return false;
+    }
+
+    private boolean complete_log(){
+        FileOutputStream file_out = null;
+        PrintWriter writer = null;
+        FileInputStream file_in = null;
+        BufferedReader buffer = null;
+
+        long first_time;
+        String save_path = "Unknown.txt";
+        String temp;
+
+        Date start_time, end_time;
+        SimpleDateFormat format = new SimpleDateFormat("yyyy:MM:dd:HH:mm:ss");
+
+
+        try {
+            file_in = openFileInput(SAVED_TEMP_LOG);
+            buffer = new BufferedReader(new InputStreamReader(file_in));
+
+            if((temp = buffer.readLine()) != null){
+                StringTokenizer tokenizer = new StringTokenizer(temp,":");
+                tokenizer.nextToken();
+                first_time = Long.parseLong(tokenizer.nextToken());
+                start_time = new Date(first_time);
+                end_time = new Date(state_start_time);
+                save_path = getFilesDir().getAbsolutePath() + File.separator + LOG_FILE_FOLDER;
+                save_path += File.separator + format.format(first_time) + "~" + format.format(end_time) + ".txt";
+            }
+
+            file_out = new FileOutputStream(save_path);
+            writer = new PrintWriter(file_out);
+
+            if(temp != null){
+                writer.println(temp);
+            }
+            while((temp = buffer.readLine()) != null){
+                writer.println(temp);
+            }
+
+        } catch (FileNotFoundException e) {
+            return false;
+        }
+        catch (IOException e1){
+            return false;
+        }
+        finally{
+            try {
+                if(writer != null) writer.close();
+                if(file_out != null) file_out.close();
+                if(buffer != null) buffer.close();
+                if(file_in != null) file_in.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return true;
+    }
 
     public List<String> query_device() {
         List<String> result = new ArrayList<String>();
@@ -842,6 +844,19 @@ public class BLEService extends Service {
 
         TARGET_ADDRESS = address;
         connect_gatt(address);
+
+        if(address.equals("")){
+            long time = System.currentTimeMillis();
+            Intent intent = new Intent(STATE_CHANGE_NOTIFY);
+            save_state(STATE_INIT, time);
+            clear_log_file();
+            is_lain = false;
+            now_state = STATE_INIT;
+            state_start_time = time;
+            intent.putExtra(NOTIFY_STATE, now_state);
+            sendBroadcast(intent);
+        }
+
         return true;
     }
 
