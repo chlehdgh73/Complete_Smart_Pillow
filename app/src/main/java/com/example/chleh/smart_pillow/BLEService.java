@@ -352,6 +352,90 @@ public class BLEService extends Service {
                     @Override
                     public void run() {
                         connect_gatt(TARGET_ADDRESS);
+                        mHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                if(is_ble_connected == true){
+                                    return;
+                                }
+                                long time = System.currentTimeMillis();
+                                Intent intent = new Intent(STATE_CHANGE_NOTIFY);
+                                switch(now_state){
+                                    case STATE_INIT:
+                                        break;
+                                    case STATE_LAIN:
+                                        save_state(STATE_INIT, time);
+                                        clear_log_file();
+                                        is_lain = false;
+                                        now_state = STATE_INIT;
+                                        state_start_time = time;
+                                        intent.putExtra(NOTIFY_STATE, now_state);
+                                        sendBroadcast(intent);
+                                        break;
+                                    case STATE_DEEP:
+                                    case STATE_SHALLOW:
+                                    case STATE_RE_LAIN:
+                                        save_state(STATE_TEMP_AWAKE, time);
+                                        save_change_log(STATE_TEMP_AWAKE, time);
+                                        is_lain = false;
+                                        now_state = STATE_TEMP_AWAKE;
+                                        state_start_time = time;
+                                        intent.putExtra(NOTIFY_STATE, now_state);
+                                        sendBroadcast(intent);
+
+                                        time = System.currentTimeMillis();
+                                        intent = new Intent(STATE_CHANGE_NOTIFY);
+
+                                        save_state(STATE_COMPLETE_AWAKE, time);
+                                        save_change_log(STATE_COMPLETE_AWAKE, time);
+                                        now_state = STATE_COMPLETE_AWAKE;
+                                        state_start_time = time;
+                                        intent.putExtra(NOTIFY_STATE, now_state);
+                                        sendBroadcast(intent);
+
+                                        time = System.currentTimeMillis();
+                                        intent = new Intent(STATE_CHANGE_NOTIFY);
+
+                                        complete_log();
+                                        clear_log_file();
+                                        save_state(STATE_INIT, time);
+                                        now_state = STATE_INIT;
+                                        state_start_time = time;
+                                        intent.putExtra(NOTIFY_STATE, now_state);
+                                        sendBroadcast(intent);
+
+                                        break;
+                                    case STATE_TEMP_AWAKE:
+                                        save_state(STATE_COMPLETE_AWAKE, time);
+                                        save_change_log(STATE_COMPLETE_AWAKE, time);
+                                        now_state = STATE_COMPLETE_AWAKE;
+                                        state_start_time = time;
+                                        intent.putExtra(NOTIFY_STATE, now_state);
+                                        sendBroadcast(intent);
+
+                                        time = System.currentTimeMillis();
+                                        intent = new Intent(STATE_CHANGE_NOTIFY);
+
+                                        complete_log();
+                                        clear_log_file();
+                                        save_state(STATE_INIT, time);
+                                        now_state = STATE_INIT;
+                                        state_start_time = time;
+                                        intent.putExtra(NOTIFY_STATE, now_state);
+                                        sendBroadcast(intent);
+                                        break;
+                                    case STATE_COMPLETE_AWAKE:
+                                        complete_log();
+                                        clear_log_file();
+                                        save_state(STATE_INIT, time);
+                                        now_state = STATE_INIT;
+                                        state_start_time = time;
+                                        intent.putExtra(NOTIFY_STATE, now_state);
+                                        sendBroadcast(intent);
+                                        break;
+                                }
+                            }
+                        },20000);
                     }
                 }, BLE_SCAN_PERIOD);
             }
@@ -722,15 +806,15 @@ public class BLEService extends Service {
     }
 
     public int query_state(){
-            return now_state;
+        return now_state;
     }
 
     public boolean query_lain_state(){
-            return is_lain;
+        return is_lain;
     }
 
     public boolean query_connection(){
-            return is_ble_connected;
+        return is_ble_connected;
     }
 
     public boolean select_device(String address){
@@ -742,7 +826,7 @@ public class BLEService extends Service {
             writer = new PrintWriter(file_out);
             writer.println(address);
         } catch (FileNotFoundException e) {
-                return false;
+            return false;
         }
         catch (IOException e1){
             return false;
